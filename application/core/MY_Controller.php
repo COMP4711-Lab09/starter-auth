@@ -40,6 +40,7 @@ class Application extends CI_Controller {
                 $this->data['userrole'] = $this->session->userdata('userRole');
                 
 		$this->data['menubar'] = $this->parser->parse('_menubar', $mychoices, true);
+                //$this->data['menubar'] = $this->makemenu();
                 $this->data['content'] = $this->parser->parse($this->data['pagebody'], $this->data, true);
 
 		// finally, build the browser page!
@@ -50,15 +51,25 @@ class Application extends CI_Controller {
 	// build menu choices depending on the user role
 	function makemenu()
 	{
-		$choices = array();
+            $userRole= $this->session->userdata('userRole');
+            $userName = $this->session->userdata('userName');
 
-		$choices[] = array('name' => "Alpha", 'link' => '/alpha');
+            $choices = array();
+            $choices[] = array('name' => "Alpha", 'link' => '/alpha');
+            
+            if(!isset($userRole) && !isset($userName)) {
+                $choices[] = array('name' => "Login", 'link' => '/auth');
+            } else if($userRole == ROLE_USER){
+		$choices[] = array('name' => "Beta", 'link' => '/beta');
+
+                $choices[] = array('name' => "Logout", 'link' => '/auth/logout');
+            } else if($userRole == ROLE_ADMIN) {
 		$choices[] = array('name' => "Beta", 'link' => '/beta');
 		$choices[] = array('name' => "Gamma", 'link' => '/gamma');
                 
-                $choices[] = array('name' => "Login", 'link' => '/auth');
                 $choices[] = array('name' => "Logout", 'link' => '/auth/logout');
-		return $choices;
+            }	
+            return $choices;
 	}
 
         function restrict($roleNeeded = null) {
